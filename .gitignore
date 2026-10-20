@@ -1,0 +1,19 @@
+# Neovim state and editor artifacts
+nvim.log
+.nvimlog
+*.swp
+*.swo
+*.swn
+*.un~
+*.tmp
+
+# Generated Neovim help tags
+/doc/tags
+
+# macOS metadata
+.DS_Store
+
+# Local environment configuration
+.env
+.env.*
+!.env.example

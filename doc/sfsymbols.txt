@@ -1,0 +1,85 @@
+*sfsymbols.txt*  SF Symbols picker for Neovim
+
+==============================================================================
+CONTENTS                                                   *sfsymbols-contents*
+
+    Usage ................................................ |sfsymbols-usage|
+    Configuration ........................................ |sfsymbols-config|
+    Requirements ......................................... |sfsymbols-requirements|
+
+==============================================================================
+USAGE                                                         *sfsymbols-usage*
+
+:SFSymbols [query]                                                *:SFSymbols*
+    Open a Snacks fuzzy picker of installed SF Symbol names, optionally with
+    an initial query. Result glyphs share a compact column; a dim circle.slash
+    SF Symbol means the name has no font glyph, not that it is unavailable.
+    Result rows remain compact without blank spacer lines. The selected
+    symbol is rendered as a session-only AppKit PNG. Its bold name sits above
+    a centered image tinted to the preview's text foreground, a divider, and
+    concise Availability and Rendering modes rows.
+    Searches names only, not aliases or keywords.
+
+    <Enter>     Copy the name to the + and unnamed registers.
+    <C-i>       Insert the name after the cursor in the original buffer.
+                May also be triggered by Tab in some terminals.
+    <Tab> and <S-Tab> are not bound to multi-select actions. <C-a> is not
+    mapped by this plugin and remains available for native input behavior.
+    <Esc>       Close (subject to your Snacks picker mappings).
+
+    Lua: >lua
+        require("sfsymbols").open({ query = "map" })
+<
+    The catalog loads asynchronously once per Neovim session. Restart Neovim
+    after updating the SF Symbols app. The selected symbol is rendered on
+    demand by a small AppKit helper. Its executable is cached under
+    stdpath("cache"); the current PNG is kept in a per-picker session
+    directory and removed when the selection changes, filtering leaves no
+    results, the picker closes, or Neovim exits. Snacks identification metadata for that PNG is also removed.
+    Its shared image cache is never cleared; internal image objects may remain
+    in memory until Neovim exits because Snacks has no per-image eviction API.
+    The helper is compiled on first use and keyed by source, OS, and architecture.
+    Builds use separate temporary files, then atomically publish one cached
+    executable so independent Neovim instances cannot delete each other's builds.
+    Unsupported terminals and small previews skip rendering and show text.
+    All names from the app's name_availability.plist are included, even variants
+    omitted by the CLI. Extra entries show name availability without a glyph.
+    Metadata is read using macOS's built-in plutil, relative to the CLI path;
+    unreadable metadata produces an error rather than a partial catalog.
+    Symbols missing from the running macOS version show an unavailable
+    message alongside their platform availability.
+    The preview summarizes monochrome availability, falling back to name
+    availability for metadata-only entries. Rendering modes are listed
+    separately; metadata-only entries say "Not provided". All raw availability
+    records remain in the catalog. The default layout gives the preview 60% of
+    the picker width.
+
+==============================================================================
+CONFIGURATION                                                *sfsymbols-config*
+
+    Call setup once, or use lazy.nvim's opts: >lua
+        require("sfsymbols").setup({
+          cli = "/Applications/SF Symbols.app/Contents/Executables/sfsymbols",
+          glyphs = true,
+          picker = {}, -- Snacks picker option overrides
+        })
+<
+    glyphs=false hides the result-row icon column. picker can override the
+    layout, actions, mappings, format, and other Snacks picker settings.
+
+==============================================================================
+REQUIREMENTS                                           *sfsymbols-requirements*
+
+    macOS, Neovim 0.10+, snacks.nvim with picker and image enabled, Apple's
+    swiftc compiler, and the SF Symbols app with a bundled CLI supporting
+    search --json --show-glyph. Older app versions may not include the CLI.
+    Image previews require a terminal with Kitty Graphics Protocol support.
+    Clipboard copying needs a working Neovim clipboard provider; use
+    :checkhealth vim.provider to diagnose problems.
+
+    Font fallback in your terminal must support Apple's private-use code
+    points for glyphs in result rows. Glyph availability varies by symbol and
+    installed font. Platform availability is catalog metadata, not validation
+    against your app's deployment target.
+
+vim:tw=78:ts=8:ft=help:norl:
