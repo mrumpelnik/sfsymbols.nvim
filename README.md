@@ -6,6 +6,8 @@ session-only PNG in the preview, followed by compact platform availability and
 rendering-mode details. Copy names for SwiftUI's `Image(systemName:)` or insert them
 directly into your buffer. No downloaded catalog required.
 
+![SF Symbols picker with symbol list, image preview, and platform availability](assets/screenshot.png)
+
 ## Requirements
 
 - macOS and Neovim 0.10+
